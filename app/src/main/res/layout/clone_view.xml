@@ -101,6 +101,28 @@
         android:visibility="@{viewModel.initLocal ? View.GONE : View.VISIBLE}"
         android:checked="@={viewModel.cloneRecursively}"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:visibility="@{viewModel.initLocal ? View.GONE : View.VISIBLE}">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="@dimen/general_dialog_text_size"
+            android:text="@{viewModel.mtlsKeyAlias != null ? viewModel.mtlsKeyAlias : @string/mtls_no_cert}" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mtls_select_cert"
+            android:onClick="@{() -> clickHandler.onActionClick(ClickActions.SELECT_MTLS_CERT.name())}" />
+
+    </LinearLayout>
+
     </LinearLayout>
 
         <Button

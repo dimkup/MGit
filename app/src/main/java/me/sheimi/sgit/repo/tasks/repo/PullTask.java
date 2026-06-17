@@ -26,7 +26,7 @@ public class PullTask extends RepoRemoteOpTask {
     }
 
     @Override
-    protected Boolean doInBackground(Void... params) {
+    protected Boolean doRemoteOperation(Void... params) {
         boolean result = pullRepo();
         if (mCallback != null) {
             result = mCallback.doInBackground(params) & result;

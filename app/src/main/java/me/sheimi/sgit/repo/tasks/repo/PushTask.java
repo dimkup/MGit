@@ -33,7 +33,7 @@ public class PushTask extends RepoRemoteOpTask {
     }
 
     @Override
-    protected Boolean doInBackground(Void... params) {
+    protected Boolean doRemoteOperation(Void... params) {
         boolean result = pushRepo();
         if (mCallback != null) {
             result = mCallback.doInBackground(params) & result;

@@ -21,6 +21,7 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
     val localRepoName : MutableLiveData<String> = MutableLiveData()
     var cloneRecursively : Boolean = false
     val initLocal : MutableLiveData<Boolean> = MutableLiveData()
+    val mtlsKeyAlias : MutableLiveData<String?> = MutableLiveData(null)
 
     var remoteUrlError : MutableLiveData<String?> = MutableLiveData()
     var localRepoNameError : MutableLiveData<String?> = MutableLiveData()
@@ -46,9 +47,11 @@ class CloneViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             Timber.d("CLONE REPO %s %s [%b]", localRepoName.value, remoteUrl, cloneRecursively)
             val repo = Repo.createRepo(localRepoName.value, remoteUrl, "")
+            mtlsKeyAlias.value?.let { repo.saveMtlsKeyAlias(it) }
             val task = CloneTask(repo, cloneRecursively, "", null)
             task.executeTask()
             remoteUrl = ""
+            mtlsKeyAlias.value = null
             show(false)
         }
     }

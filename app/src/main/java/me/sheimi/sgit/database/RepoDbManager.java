@@ -64,6 +64,12 @@ public class RepoDbManager {
         }
     }
 
+    public static void persistMtlsKeyAlias(long repoId, String alias) {
+        ContentValues values = new ContentValues();
+        values.put(RepoContract.RepoEntry.COLUMN_NAME_MTLS_KEY_ALIAS, alias);
+        updateRepo(repoId, values);
+    }
+
     public static void persistCredentials(long repoId,String username, String password) {
         ContentValues values = new ContentValues();
         if (username != null && password != null) {

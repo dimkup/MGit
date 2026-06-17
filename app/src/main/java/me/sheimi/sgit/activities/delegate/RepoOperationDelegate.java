@@ -11,6 +11,7 @@ import me.sheimi.android.utils.FsUtils;
 import me.sheimi.sgit.activities.RepoDetailActivity;
 import me.sheimi.sgit.activities.delegate.actions.AddAllAction;
 import me.sheimi.sgit.activities.delegate.actions.AddRemoteAction;
+import me.sheimi.sgit.activities.delegate.actions.MtlsCertAction;
 import me.sheimi.sgit.activities.delegate.actions.CherryPickAction;
 import me.sheimi.sgit.activities.delegate.actions.CommitAction;
 import me.sheimi.sgit.activities.delegate.actions.ConfigAction;
@@ -68,6 +69,7 @@ public class RepoOperationDelegate {
         mActions.add(new DeleteAction(mRepo, mActivity));
         mActions.add(new RawConfigAction(mRepo, mActivity));
         mActions.add(new ConfigAction(mRepo, mActivity));
+        mActions.add(new MtlsCertAction(mRepo, mActivity));
     }
 
     public void executeAction(int key) {

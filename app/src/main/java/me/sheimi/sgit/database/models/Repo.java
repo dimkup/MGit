@@ -60,6 +60,7 @@ public class Repo implements Comparable<Repo>, Serializable {
     private String mRemoteURL;
     private String mUsername;
     private String mPassword;
+    private String mMtlsKeyAlias;
     private String mRepoStatus;
     private String mLastCommitter;
     private String mLastCommitterEmail;
@@ -84,6 +85,7 @@ public class Repo implements Comparable<Repo>, Serializable {
         mLocalPath = RepoContract.getLocalPath(cursor);
         mUsername = RepoContract.getUsername(cursor);
         mPassword = RepoContract.getPassword(cursor);
+        mMtlsKeyAlias = RepoContract.getMtlsKeyAlias(cursor);
         mRepoStatus = RepoContract.getRepoStatus(cursor);
         mLastCommitter = RepoContract.getLatestCommitterName(cursor);
         mLastCommitterEmail = RepoContract.getLatestCommitterEmail(cursor);
@@ -241,6 +243,7 @@ public class Repo implements Comparable<Repo>, Serializable {
         out.writeObject(mLastCommitterEmail);
         out.writeObject(mLastCommitDate);
         out.writeObject(mLastCommitMsg);
+        out.writeObject(mMtlsKeyAlias);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
@@ -255,6 +258,7 @@ public class Repo implements Comparable<Repo>, Serializable {
         mLastCommitterEmail = (String) in.readObject();
         mLastCommitDate = (Date) in.readObject();
         mLastCommitMsg = (String) in.readObject();
+        mMtlsKeyAlias = (String) in.readObject();
     }
 
     @Override
@@ -617,5 +621,14 @@ public class Repo implements Comparable<Repo>, Serializable {
 
     public void saveCredentials() {
         RepoDbManager.persistCredentials(getID(), getUsername(), getPassword());
+    }
+
+    public String getMtlsKeyAlias() {
+        return mMtlsKeyAlias;
+    }
+
+    public void saveMtlsKeyAlias(String alias) {
+        mMtlsKeyAlias = alias;
+        RepoDbManager.persistMtlsKeyAlias(getID(), alias);
     }
 }

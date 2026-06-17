@@ -59,13 +59,24 @@ import org.eclipse.jgit.transport.http.HttpConnectionFactory;
  * @since 3.3
  */
 public class MGitHttpConnectionFactory implements HttpConnectionFactory {
+
+    private static final ThreadLocal<String> sMtlsAlias = new ThreadLocal<>();
+
+    public static void setMtlsAlias(String alias) {
+        sMtlsAlias.set(alias);
+    }
+
+    public static void clearMtlsAlias() {
+        sMtlsAlias.remove();
+    }
+
     public HttpConnection create(URL url) throws IOException {
-        return new MGitHttpConnection(url);
+        return new MGitHttpConnection(url, sMtlsAlias.get());
     }
 
     public HttpConnection create(URL url, Proxy proxy)
             throws IOException {
-        return new MGitHttpConnection(url, proxy);
+        return new MGitHttpConnection(url, proxy, sMtlsAlias.get());
     }
 
     public static void install() {

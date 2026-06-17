@@ -4,6 +4,7 @@ import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
+import com.manichord.mgit.transport.MGitHttpConnectionFactory;
 import me.sheimi.android.activities.SheimiFragmentActivity.OnPasswordEntered;
 import me.sheimi.android.utils.BasicFunctions;
 import me.sheimi.sgit.R;
@@ -63,6 +64,17 @@ public abstract class RepoOpTask extends SheimiAsyncTask<Void, String, Boolean> 
             Timber.d("no CredentialsProvider when no username/password provided");
         }
 
+    }
+
+    protected void setupMtls() {
+        String alias = mRepo.getMtlsKeyAlias();
+        if (alias != null && !alias.isEmpty()) {
+            MGitHttpConnectionFactory.setMtlsAlias(alias);
+        }
+    }
+
+    protected void clearMtls() {
+        MGitHttpConnectionFactory.clearMtlsAlias();
     }
 
     protected void handleAuthError(OnPasswordEntered onPassEntered) {

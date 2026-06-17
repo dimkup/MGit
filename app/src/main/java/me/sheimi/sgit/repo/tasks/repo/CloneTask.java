@@ -35,7 +35,7 @@ public class CloneTask extends RepoRemoteOpTask {
     }
 
     @Override
-    protected Boolean doInBackground(Void... v) {
+    protected Boolean doRemoteOperation(Void... v) {
         boolean result = cloneRepo();
         if (!result) {
             Timber.e("del repo. clone failed");
@@ -113,9 +113,11 @@ public class CloneTask extends RepoRemoteOpTask {
         // need to call create repo again as when clone fails due auth error, the repo initially created gets deleted
         String userName = mRepo.getUsername();
         String password = mRepo.getPassword();
+        String mtlsAlias = mRepo.getMtlsKeyAlias();
         mRepo = Repo.createRepo(mRepo.getLocalPath(), mRepo.getRemoteURL(), mCloneStatusName);
         mRepo.setUsername(userName);
         mRepo.setPassword(password);
+        if (mtlsAlias != null) mRepo.saveMtlsKeyAlias(mtlsAlias);
         return new CloneTask(mRepo, mCloneRecursive, mCloneStatusName, mCallback);
     }
 

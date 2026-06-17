@@ -3,6 +3,7 @@ package com.manichord.mgit.repolist;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.security.KeyChain;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.content.ActivityNotFoundException;
@@ -58,7 +59,7 @@ public class RepoListActivity extends SheimiFragmentActivity {
     private ActivityMainBinding binding;
 
     public enum ClickActions {
-        CLONE, CANCEL
+        CLONE, CANCEL, SELECT_MTLS_CERT
     }
 
     @Override
@@ -77,6 +78,10 @@ public class RepoListActivity extends SheimiFragmentActivity {
             public void onActionClick(String action) {
                 if (ClickActions.CLONE.name().equals(action)) {
                     cloneRepo();
+                } else if (ClickActions.SELECT_MTLS_CERT.name().equals(action)) {
+                    KeyChain.choosePrivateKeyAlias(RepoListActivity.this,
+                            alias -> cloneViewModel.getMtlsKeyAlias().postValue(alias),
+                            null, null, null, -1, null);
                 } else {
                     hideCloneView();
                 }

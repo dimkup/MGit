@@ -66,7 +66,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
+import me.sheimi.sgit.MGitApplication;
 import org.eclipse.jgit.transport.http.HttpConnection;
+import timber.log.Timber;
 
 /**
  * A {@link HttpConnection} which simply delegates every call to a
@@ -76,28 +78,36 @@ import org.eclipse.jgit.transport.http.HttpConnection;
  */
 public class MGitHttpConnection implements HttpConnection {
     HttpURLConnection wrappedUrlConnection;
+    private final String mMtlsAlias;
 
-    /**
-     * @param url
-     * @throws MalformedURLException
-     * @throws IOException
-     */
-    protected MGitHttpConnection(URL url)
-            throws MalformedURLException,
-            IOException {
+    protected MGitHttpConnection(URL url, String mtlsAlias)
+            throws MalformedURLException, IOException {
         this.wrappedUrlConnection = (HttpURLConnection) url.openConnection();
+        this.mMtlsAlias = mtlsAlias;
+        if (mtlsAlias != null) {
+            applyMtls();
+        }
     }
 
-    /**
-     * @param url
-     * @param proxy
-     * @throws MalformedURLException
-     * @throws IOException
-     */
-    protected MGitHttpConnection(URL url, Proxy proxy)
+    protected MGitHttpConnection(URL url, Proxy proxy, String mtlsAlias)
             throws MalformedURLException, IOException {
-        this.wrappedUrlConnection = (HttpURLConnection) url
-                .openConnection(proxy);
+        this.wrappedUrlConnection = (HttpURLConnection) url.openConnection(proxy);
+        this.mMtlsAlias = mtlsAlias;
+        if (mtlsAlias != null) {
+            applyMtls();
+        }
+    }
+
+    private void applyMtls() {
+        if (!(wrappedUrlConnection instanceof HttpsURLConnection)) return;
+        try {
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            ctx.init(new KeyManager[]{new KeyChainKeyManager(MGitApplication.getContext(), mMtlsAlias)}, null, null);
+            SSLSocketFactory factory = new MGitSSLSocketFactory(ctx.getSocketFactory());
+            ((HttpsURLConnection) wrappedUrlConnection).setSSLSocketFactory(factory);
+        } catch (Exception e) {
+            Timber.e(e, "Failed to configure mTLS SSL context");
+        }
     }
 
     public int getResponseCode() throws IOException {
@@ -192,6 +202,17 @@ public class MGitHttpConnection implements HttpConnection {
     public void configure(KeyManager[] km, TrustManager[] tm,
             SecureRandom random) throws NoSuchAlgorithmException,
             KeyManagementException {
+        if (mMtlsAlias != null) {
+            KeyManager keyChainKm = new KeyChainKeyManager(MGitApplication.getContext(), mMtlsAlias);
+            if (km == null) {
+                km = new KeyManager[]{keyChainKm};
+            } else {
+                KeyManager[] merged = new KeyManager[km.length + 1];
+                merged[0] = keyChainKm;
+                System.arraycopy(km, 0, merged, 1, km.length);
+                km = merged;
+            }
+        }
         SSLContext ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
         ctx.init(km, tm, random);
         SSLSocketFactory factory = ctx.getSocketFactory();

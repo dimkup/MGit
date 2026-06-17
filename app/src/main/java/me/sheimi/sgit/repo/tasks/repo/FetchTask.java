@@ -23,7 +23,7 @@ public class FetchTask extends RepoRemoteOpTask {
     }
 
     @Override
-    protected Boolean doInBackground(Void... params) {
+    protected Boolean doRemoteOperation(Void... params) {
         boolean result = true;
         for (final String remote : mRemotes) {
             result = fetchRepo(remote) & result;
